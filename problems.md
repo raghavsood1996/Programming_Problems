@@ -1,7 +1,7 @@
 
 # PROGRAMMING PROBLEMS
 
-1. ## Suppose an array sorted in ascending order is rotated at some pivot unknown to you beforehand.</h2>[Leetcode](https://leetcode.com/problems/search-in-rotated-sorted-array/)
+1. ## Suppose an array sorted in ascending order is rotated at some pivot unknown to you beforehand.</br>[Leetcode](https://leetcode.com/problems/search-in-rotated-sorted-array/)
 
     (i.e., [0,1,2,4,5,6,7] might become [4,5,6,7,0,1,2]).
 
@@ -30,7 +30,7 @@
                         return mid;
                     }
                     else if(nums[mid] >= nums[start]){ //unrotated part of the array
-                        if(target >= nums[start] && target < nums[mid])
+                        if(target >= nums[start] && target < nums[mid]) 
                             end = mid-1;
                         else
                             start = mid+1;
@@ -49,6 +49,165 @@
     ```
 
     ### Notes
+
     * Binary Search Problem
     * Figure out what part of the array the middle element and target belong to and accordingly change start and end of the binary search.
+
+2. ## **DFS GRAPH**
+
+   ```C++
+       #include <iostream>
+       #include <list>
+        #include<memory>
+        using namespace std;
+
+        class Node{
+            public:
+            int val;
+            int stat; //0 if unvisited 1 if visited and -1 if visiting
+            list<Node*> neighbors;
+
+            Node(int val){
+                this->val = val;
+                this->stat = 0;
+            }
+        };
+
+        class Graph{
+            public:
+            list<Node*> vertices;
+        };
+
+        bool dfs_visit(Node* n,int target){
+            if(n->stat == 1){
+                return 0;
+            }
+            if(n->val == target){
+
+                return 1;
+            }
+
+            n->stat = -1; //visiting
+            for(auto neigh: n->neighbors){
+                if(dfs_visit(neigh,target)){
+                    return 1;
+                };
+            }
+
+            n->stat = 1; //visited
+            return 0;
+
+        }
+        int main()
+        {
+
+            Node n1(1),n2(5),n3(6),n4(8),n5(7),n6(9);
+            Graph le_graph;
+            n1.neighbors.push_back(&n2);
+            n1.neighbors.push_back(&n3);
+            n2.neighbors.push_back(&n4);
+            n3.neighbors.push_back(&n4);
+            n3.neighbors.push_back(&n5);
+            n4.neighbors.push_back(&n6);
+
+            le_graph.vertices.push_back(&n1);
+            le_graph.vertices.push_back(&n2);
+            le_graph.vertices.push_back(&n3);
+            le_graph.vertices.push_back(&n4);
+            le_graph.vertices.push_back(&n5);
+            le_graph.vertices.push_back(&n6);
+            int target = 100;
+
+            if(dfs_visit(&n1,target)){
+                cout<<"target found";
+            }
+            else{
+                cout<<"not found"<<"\n";
+            }
+
+            return 0;
+        }
+    ```
+
+3. ## **BFS GRAPH**
+
+    ```C++
+    #include <iostream>
+    #include <list>
+    #include<memory>
+    #include<queue>
+    using namespace std;
+
+    class Node
+    {
+        public:
+        int val;
+        int stat; //0 if unvisited 1 if visited and -1 if visiting
+        list<Node*> neighbors;
+
+        Node(int val){
+            this->val = val;
+            this->stat = 0;
+        }
+    };
+
+    class Graph
+    {
+        public:
+        list<Node*> vertices;
+    };
   
+    void bfs(Node* start)
+    {
+        if(start->stat == 1|| start== NULL)
+        {
+            return;
+        }
+
+    queue<Node*> q;
+    q.push(start);
+    start->stat = -1;
+        while(!q.empty())
+        {
+            Node* current = q.front();
+            q.pop();
+
+            std::cout<<current->val<<"\n"; //processing the current node
+            for(auto neigh: current->neighbors)
+            {
+                if(neigh->stat == 0) //only processing the unvisited nodes
+                {
+                    q.push(neigh);
+                    neigh->stat = -1;
+                }
+            }
+            current->stat = 1;
+        }
+     return;
+    }
+
+    int main()
+    {
+
+        Node n1(1),n2(5),n3(6),n4(8),n5(7),n6(9);
+        Graph le_graph;
+        n1.neighbors.push_back(&n2);
+        n1.neighbors.push_back(&n3);
+        n2.neighbors.push_back(&n4);
+        n3.neighbors.push_back(&n4);
+        n3.neighbors.push_back(&n5);
+        n4.neighbors.push_back(&n6);
+
+        le_graph.vertices.push_back(&n1);
+        le_graph.vertices.push_back(&n2);
+        le_graph.vertices.push_back(&n3);
+        le_graph.vertices.push_back(&n4);
+        le_graph.vertices.push_back(&n5);
+        le_graph.vertices.push_back(&n6);
+        int target = 100;
+
+
+        bfs(&n1);
+
+        return 0;
+     }
