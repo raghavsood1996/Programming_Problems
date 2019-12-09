@@ -211,3 +211,68 @@
 
         return 0;
      }
+    ```
+
+4. ## **Checking if Graph is Bipartite**
+
+    ```C++
+    class Solution {
+    public:
+
+        bool isBipartite(vector<vector<int>>& graph) {
+
+            vector<int> stat(graph.size(),0); //maintain status of a node
+
+            for(int i =0 ;i <graph.size();i++){ // go through all the components of the graph
+
+                if(stat[i] == 1) continue;
+                int start = i;
+
+                vector<int> level(graph.size(),-1); //maintain bfs level of the expansions
+                level[start] = 0;
+                queue<int> bfs_q;
+                bfs_q.push(start);
+                stat[start] = -1;
+                int curr_level = 0;
+
+                while(!bfs_q.empty()) //bfs visit
+                {
+                    int curr_node = bfs_q.front();
+
+                    bfs_q.pop();
+
+
+                    curr_level = level[curr_node] + 1;
+                    for(int ngb: graph[curr_node])
+                    {
+
+                        if(stat[ngb] == 1) continue;
+
+
+                        if(level[ngb] == level[curr_node]) //odd cycle
+                        {
+
+                            return 0;
+                        }
+
+
+                        bfs_q.push(ngb);
+                        stat[ngb] = -1;
+
+                        level[ngb] = curr_level;
+
+                    }
+
+                    stat[curr_node] = 1; //done processing current node
+                }
+            }
+            return 1;
+        }
+    };
+    ```
+
+    ### Notes
+    * Bipartite Graph is a graph in which we can seperate the nodes in two groups such that there are no edges between node of a group.
+    * Usually asked for undirecte graphs.
+    * Implented using **BFS** by keeping track of the level of nodes.
+    * If the level a parent and a neighbour node is same then there is an odd cycle in the graph and the graph is not Bipartite.
