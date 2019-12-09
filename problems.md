@@ -277,7 +277,7 @@
     * Implented using **BFS** by keeping track of the level of nodes.
     * If the level a parent and a neighbour node is same then there is an odd cycle in the graph and the graph is not Bipartite.
 
-5. ## **Finding Groups in Bipartite Graphs**
+5. ## **Finding Groups in Bipartite Graphs**</br> [LeetCode](https://leetcode.com/problems/possible-bipartition/)
 
     ```C++
     class Solution {
