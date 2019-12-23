@@ -420,3 +420,164 @@
     ### **NOTES**
     * Formulate Problem as finding connected components of a graph.
     * Each connected component is an island.
+
+7. ## **Diameter of a Binary Tree** </br> [Leetcode](https://leetcode.com/problems/diameter-of-binary-tree/)
+
+    Given a binary tree, you need to compute the length of the diameter of the tree. The diameter of a binary tree is the length of the longest path between any two nodes in a tree. This path may or may not pass through the root.
+
+    ```C++
+    /**
+    * Definition for a binary tree node.
+    * struct TreeNode {
+    *     int val;
+    *     TreeNode *left;
+    *     TreeNode *right;
+    *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+    * };
+    */
+    class Solution {
+    public:
+
+        int height_util(TreeNode* node, int& max_path){
+            if(node == NULL){
+            return 0;
+            }
+
+
+            int l_height = height_util(node->left,max_path); //height of left subtree
+            int r_height = height_util(node->right,max_path); // height of right subtree
+            int path_length = l_height + r_height + 1; //longest path will have the max sum of height of left and right subtree
+
+            if(path_length > max_path){
+                max_path = path_length;
+            }
+
+            return 1 + max(l_height,r_height);
+
+        }
+
+        int diameterOfBinaryTree(TreeNode* root) {
+
+            if(root == NULL){
+                return 0;
+            }
+            int max_path = -1;
+            auto ht = height_util(root, max_path);
+            return max_path - 1;
+        }
+    };
+    ```
+
+8. ## **Lowest Common Ancestor Binary Tree**</br> [Leetcode](https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-tree/)
+
+   Given a binary tree, find the lowest common ancestor (LCA) of two given nodes in the tree.
+
+   ```C++
+    /**
+    * Definition for a binary tree node.
+    * struct TreeNode {
+    *     int val;
+    *     TreeNode *left;
+    *     TreeNode *right;
+    *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+    * };
+    */
+    class Solution {
+    public:
+        TreeNode* lca_util(TreeNode* node, TreeNode* p, TreeNode* q){
+
+            if(node == NULL){
+                return NULL;
+            }
+
+            if(node->val == p->val || node->val == q->val){ 
+                return node;
+            }
+
+            TreeNode* left_lca = lca_util(node->left,p,q);
+            TreeNode* right_lca = lca_util(node->right, p,q);
+            if(left_lca != NULL && right_lca != NULL){ // if found in both right and left subtrees then it is the lowest commmon ancestor
+                return node;
+            }
+
+
+            return left_lca != NULL ? left_lca : right_lca; // if only found in one then return the one where it was found
+        }
+
+        TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
+
+            return lca_util(root,p,q);
+        }
+    };
+    ```
+
+    ### **NOTES**
+    * Follow the bottom to up approach.
+
+9. ## **Validating a BST** </br> [Leetcode](https://leetcode.com/problems/validate-binary-search-tree/submissions/)
+
+    ```C++
+        /**
+    * Definition for a binary tree node.
+    * struct TreeNode {
+    *     int val;
+    *     TreeNode *left;
+    *     TreeNode *right;
+    *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+    * };
+    */
+    class Solution {
+    public:
+        pair<long,long>* bst_util(TreeNode* node){
+
+            if( node == NULL)
+            {
+            pair<long,long>* min_max = new pair<long,long> ;
+                *min_max = make_pair(LONG_MAX, LONG_MIN); 
+                return min_max;
+
+            }
+
+
+            pair<long,long>* left = bst_util(node->left); //finding min max for left subtree
+            pair<long,long>* right = bst_util(node->right); //finding min max for right subtree
+
+            if(left == NULL || right == NULL){
+                return NULL;
+            }
+
+
+            //Max value in the left subtree should be smaller than the root value
+            //Min value in the right subtree should be greater than the root value
+
+            if(left->second >= node->val || right->first <= node->val){
+                return NULL;
+            }
+
+            long min = node->left == NULL ? node->val : left->first;
+            long max = node->right == NULL ? node->val : right->second;
+
+            pair<long,long>* ret = new pair<long,long> ;
+            *ret = make_pair(min, max); 
+            return ret;
+
+
+        }
+
+        bool isValidBST(TreeNode* root) {
+
+            if(root == NULL || (root->left == NULL && root->right == NULL)){
+                return 1;
+            }
+
+            if(bst_util(root) != NULL){
+
+
+                return 1;
+            }
+            return 0;
+        }
+
+    };
+    ```
+    
