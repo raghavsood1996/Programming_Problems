@@ -440,7 +440,7 @@
 
         int height_util(TreeNode* node, int& max_path){
             if(node == NULL){
-            return 0;
+                return 0;
             }
 
 
@@ -628,3 +628,39 @@
     $F(S) = \min_{i=0..n-1} F(S-c_i)+1$ </br>
     subject to $S-c_i \geq 0$.
     
+10. ## **Lowest Common Ancestor BST**</br>[Leetcode](https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-search-tree/submissions/)
+
+    ```C++
+        /**
+    * Definition for a binary tree node.
+    * struct TreeNode {
+    *     int val;
+    *     TreeNode *left;
+    *     TreeNode *right;
+    *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+    * };
+    */
+    class Solution {
+    public:
+        TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
+            if(root == NULL){
+                return NULL;
+            }
+
+            //keep going left or right until both p and q are on different sides of the tree
+            if(root->val < p->val && root->val <q->val){
+                return(lowestCommonAncestor(root->right,p,q));
+            }
+            
+            if(root->val >p->val && root->val > q->val){
+                return (lowestCommonAncestor(root->left,p,q));
+            }
+            
+            
+            else{
+                return root;
+            }
+        }
+    };
+
+        
