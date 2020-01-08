@@ -580,4 +580,51 @@
 
     };
     ```
+
+10. ## **Coin Change Problem DP**</br> [Leetcode](https://leetcode.com/problems/coin-change/)
+
+    You are given coins of different denominations and a total amount of money amount. Write a function to compute the fewest number of coins that you need to make up that amount. If that amount of money cannot be made up by any combination of the coins, return -1.
+
+    ```C++
+    class Solution {
+    public:
+
+        int util_coins(vector<int>& coins, int amount ,vector<int> &count){
+
+            if(amount == 0){
+                return 0;
+            }
+
+            if(amount< 0){
+                return -1;
+            }
+
+            if(count[amount-1] != 0) return count[amount-1];
+
+            int min = INT_MAX;
+            for(int coin:coins){
+                int res = util_coins(coins,amount- coin,count) ;
+                if(res>=0 && res <min){
+                    min = 1 + res;
+                }
+            }
+            count[amount-1] = min == INT_MAX ? -1 :min;
+
+            return count[amount-1];
+        }
+
+        int coinChange(vector<int>& coins, int amount) {
+        if(amount < 1){
+            return 0;
+        }
+            vector<int> count(amount+1,0);
+            return util_coins(coins,amount,count);
+        }
+    };
+    ```
+
+    ### **Intution**
+    We can use top to bottom approach of Dynamic Programming. Optimal substructure of the problem is </br>$F(s) = F(s-c) +1$ .</br> But as we dont know the denomination of the closest last coin C to S. We compute $F(S-C_i)$ for each possible denomination and choose the minimum among them.  The following recuurence relation holds:</br>
+    $F(S) = \min_{i=0..n-1} F(S-c_i)+1$ </br>
+    subject to $S-c_i \geq 0$.
     
