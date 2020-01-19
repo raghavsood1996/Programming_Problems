@@ -624,10 +624,11 @@
     ```
 
     ### **Intution**
+
     We can use top to bottom approach of Dynamic Programming. Optimal substructure of the problem is </br>$F(s) = F(s-c) +1$ .</br> But as we dont know the denomination of the closest last coin C to S. We compute $F(S-C_i)$ for each possible denomination and choose the minimum among them.  The following recuurence relation holds:</br>
     $F(S) = \min_{i=0..n-1} F(S-c_i)+1$ </br>
     subject to $S-c_i \geq 0$.
-    
+
 10. ## **Lowest Common Ancestor BST**</br>[Leetcode](https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-search-tree/submissions/)
 
     ```C++
@@ -651,16 +652,217 @@
             if(root->val < p->val && root->val <q->val){
                 return(lowestCommonAncestor(root->right,p,q));
             }
-            
+
             if(root->val >p->val && root->val > q->val){
                 return (lowestCommonAncestor(root->left,p,q));
             }
-            
-            
+
+
             else{
                 return root;
             }
         }
     };
+    ```
 
-        
+11. ## **Merge Intervals**</br> [Leetcode](https://leetcode.com/problems/merge-intervals/)
+
+    Given a collection of intervals, merge all overlapping intervals.
+
+    ```C++
+    struct Point{
+    int val;
+    bool start;
+
+
+    Point(int val,bool start){
+        this->val = val;
+        this->start = start;
+    }
+
+
+    };
+
+    struct less_than_key{ //custom comparator
+        inline bool operator()(const Point &p1, const Point &p2){
+            if(p1.val == p2.val){
+                if(p1.start){
+                    return 1;
+                }
+            }
+            return (p1.val < p2.val);
+        }
+
+    };
+
+
+    class Solution {
+    public:
+        vector<vector<int>> merge(vector<vector<int>>& intervals) {
+
+            vector<Point> points;
+            for(auto interval : intervals){
+                Point start(interval[0],1);
+                points.push_back(start);
+                Point end(interval[1],0);
+                points.push_back(end);
+            }
+
+
+            sort(points.begin(),points.end(),less_than_key());
+            vector<vector<int>> merged_intervals;
+
+            int start;
+            int num_intervals = 0;
+            for(int i=0; i<points.size();i++){
+                if(points[i].start){
+                    num_intervals++;
+                    if(num_intervals == 1){
+                        start = points[i].val;
+                    }
+                }
+
+                else if(!points[i].start){
+                    num_intervals--;
+                    if(num_intervals == 0){
+                        vector<int> m_int(2);
+                        m_int[0] = start;
+                        m_int[1] = points[i].val;
+                        merged_intervals.push_back(m_int);
+                    }
+                }
+            }
+
+
+            return merged_intervals;
+       }
+    };
+    ```
+
+    ### **Notes**
+
+    * Line Sweep Algorithm
+    * Have a custom class point with start and end ids.
+    * sort the vector of points according to time vals.
+    * go through the vector and accordingly modify the count and keep track of start and end of overlapping intervals.
+
+12. ## **Kth order Statistics (Selection Algorithm)**</br>[Leetcode](https://leetcode.com/problems/kth-largest-element-in-an-array/submissions/)
+
+    Find the kth largest element in an unsorted array. Note that it is the kth largest element in the sorted order, not the kth distinct element.
+
+    ```C++
+        class Solution {
+        public:
+
+        int get_random( int start, int end){
+            if (start > end){
+                cout<<"ERROR"<<"\n";
+            }
+            int randNum = rand()%(end-start + 1) + start;
+            return randNum;
+        }
+
+        int partition(vector<int> &nums, int pivot_idx, int start, int end){
+            int less = start;
+            for(int i = start + 1; i<= end; i++){
+                if(nums[i] <= nums[start]){
+                    swap(nums[i],nums[++less]);
+                }
+            }
+
+            swap(nums[start],nums[less]);
+            return less;
+        }
+
+        int findkthUtil(vector<int>& nums, int tar_idx, int start,int end){
+
+            int rand_idx = get_random(start,end);
+            int pivot_idx = partition(nums,pivot_idx,start,end);
+
+            if(pivot_idx == tar_idx){
+                return nums[pivot_idx];
+            }
+
+            else if(pivot_idx > tar_idx){
+                return findkthUtil(nums,tar_idx,start,pivot_idx - 1);
+            }
+
+            else{
+                return findkthUtil(nums,tar_idx,pivot_idx+1,end);
+            }
+        }
+
+        int findKthLargest(vector<int>& nums, int k) {
+            int start =0;
+            int end = nums.size()-1;
+            srand(time(NULL));
+            return findkthUtil(nums,nums.size() - k,start,end);
+        }
+    };
+    ```
+    ### **Notes**
+
+    * Algorithm for finding kth smallest or largest element in array.
+    * The Average expected time is $O(n)$ and he worst case time is $O(n^2)$.
+
+13. ## **Merge Sort**
+
+    ```C++
+        class Solution {
+        public:
+
+            void merge(vector<int>& nums,int start, int mid,int end){
+                int itr1= start;
+                int itr2= mid+1;
+
+                vector<int> merged;
+                while(itr1 <= mid && itr2 <= end){
+
+                    if(nums[itr1] <= nums[itr2]){
+                        merged.push_back(nums[itr1]);
+                        itr1++;
+                    }
+                    else{
+                        merged.push_back(nums[itr2]);
+                        itr2++;
+                    }
+                }
+
+                while(itr1<=mid){
+                    merged.push_back(nums[itr1]);
+                    itr1++;
+                }
+
+                while(itr2<= end){
+                    merged.push_back(nums[itr2]);
+                    itr2++;
+                }
+
+                int itr =0 ;
+
+                for(int i = start; i<= end; i++){
+                    nums[i] = merged[itr];
+                    itr++;
+                }
+            }
+
+            void merge_sort(vector<int> &nums, int start,int end){
+                if(start >= end){
+                    return;
+                }
+
+                int mid = start + (end-start)/2;
+                merge_sort(nums,start,mid);
+                merge_sort(nums,mid+1,end);
+                merge(nums,start,mid,end);
+            }
+            vector<int> sortArray(vector<int>& nums) {
+
+                int start = 0;
+                int end = nums.size()-1;
+                merge_sort(nums,start,end);
+                return nums;
+
+            }
+        };
+    ```
