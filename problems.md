@@ -517,7 +517,7 @@
 9. ## **Validating a BST** </br> [Leetcode](https://leetcode.com/problems/validate-binary-search-tree/submissions/)
 
     ```C++
-        /**
+    /**
     * Definition for a binary tree node.
     * struct TreeNode {
     *     int val;
@@ -528,41 +528,38 @@
     */
     class Solution {
     public:
+
         pair<long,long>* bst_util(TreeNode* node){
-
-            if( node == NULL)
-            {
-            pair<long,long>* min_max = new pair<long,long> ;
-                *min_max = make_pair(LONG_MAX, LONG_MIN); 
-                return min_max;
-
+            if(node == NULL){
+                pair<long,long>* max_min = new pair<long,long>;
+                *max_min = make_pair(LONG_MIN,LONG_MAX);
+                return max_min;
             }
 
 
-            pair<long,long>* left = bst_util(node->left); //finding min max for left subtree
-            pair<long,long>* right = bst_util(node->right); //finding min max for right subtree
+            auto left_max_min = bst_util(node->left);
+            auto right_max_min = bst_util(node->right);
 
-            if(left == NULL || right == NULL){
+            if(left_max_min == NULL || right_max_min == NULL){
                 return NULL;
             }
 
 
-            //Max value in the left subtree should be smaller than the root value
-            //Min value in the right subtree should be greater than the root value
-
-            if(left->second >= node->val || right->first <= node->val){
+            if(left_max_min->first >= node->val || right_max_min->second <= node->val){
                 return NULL;
             }
 
-            long min = node->left == NULL ? node->val : left->first;
-            long max = node->right == NULL ? node->val : right->second;
 
-            pair<long,long>* ret = new pair<long,long> ;
-            *ret = make_pair(min, max); 
+            long l_max = node->left == NULL ? node->val : left_max_min->second; //returning min val of right subtree
+            long r_min = node->right == NULL ? node->val : right_max_min->first; //returning max value of left subtree
+
+            pair<long,long>* ret = new pair<long,long>;
+
+            *ret = make_pair(r_min,l_max);
             return ret;
 
-
         }
+
 
         bool isValidBST(TreeNode* root) {
 
@@ -570,16 +567,19 @@
                 return 1;
             }
 
-            if(bst_util(root) != NULL){
-
-
-                return 1;
+            if(bst_util(root))
+            {
+                return true;
             }
-            return 0;
-        }
 
+            return false;
+        }
     };
     ```
+
+    ### **Notes**
+    * Make sure the Maximum of the left subtree is less than the root and min orf the right subtree is greater than the root.
+    * Do it in bottom to top fashion considering the leave nodes as always balanced.
 
 10. ## **Coin Change Problem DP**</br> [Leetcode](https://leetcode.com/problems/coin-change/)
 
@@ -629,7 +629,7 @@
     $F(S) = \min_{i=0..n-1} F(S-c_i)+1$ </br>
     subject to $S-c_i \geq 0$.
 
-10. ## **Lowest Common Ancestor BST**</br>[Leetcode](https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-search-tree/submissions/)
+11. ## **Lowest Common Ancestor BST**</br>[Leetcode](https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-search-tree/submissions/)
 
     ```C++
         /**
@@ -665,7 +665,7 @@
     };
     ```
 
-11. ## **Merge Intervals**</br> [Leetcode](https://leetcode.com/problems/merge-intervals/)
+12. ## **Merge Intervals**</br> [Leetcode](https://leetcode.com/problems/merge-intervals/)
 
     Given a collection of intervals, merge all overlapping intervals.
 
@@ -746,7 +746,7 @@
     * sort the vector of points according to time vals.
     * go through the vector and accordingly modify the count and keep track of start and end of overlapping intervals.
 
-12. ## **Kth order Statistics (Selection Algorithm)**</br>[Leetcode](https://leetcode.com/problems/kth-largest-element-in-an-array/submissions/)
+13. ## **Kth order Statistics (Selection Algorithm)**</br>[Leetcode](https://leetcode.com/problems/kth-largest-element-in-an-array/submissions/)
 
     Find the kth largest element in an unsorted array. Note that it is the kth largest element in the sorted order, not the kth distinct element.
 
@@ -805,7 +805,7 @@
     * Algorithm for finding kth smallest or largest element in array.
     * The Average expected time is $O(n)$ and he worst case time is $O(n^2)$.
 
-13. ## **Merge Sort**
+14. ## **Merge Sort**
 
     ```C++
         class Solution {
@@ -866,3 +866,181 @@
             }
         };
     ```
+
+15. ## **Distribute Coins in a Binary Tree**</br>[Leetcode](https://leetcode.com/problems/distribute-coins-in-binary-tree/solution/)
+
+    ```C++
+        class Solution {
+            public:
+                int ans;
+                int distributeCoins(TreeNode* root) {
+                    ans = 0;
+                    dfs(root);
+                    return ans;
+                }
+
+                int dfs(TreeNode* node) {
+                    if (node == NULL) return 0;
+                    int L = dfs(node->left);
+                    int R = dfs(node->right);
+                    ans += abs(L) + abs(R);
+                    return node->val + L + R - 1;
+                }
+    };
+    ```
+
+    ### **NOTES**
+
+    * **Intiution**: Moves to baalnce a leaf is $abs(NumCoins_{leaf} -1)$
+    * **Algorithm**: &nbsp; $moves_{node} = moves_{left} + moves_{right} + node->val -1$
+
+16. ## **Binary Tree Pruning**</br>[Leetcode](https://leetcode.com/problems/binary-tree-pruning/)
+
+    We are given the head node root of a binary tree, where additionally every node's value is either a 0 or a 1. Return the same tree where every subtree (of the given tree) not containing a 1 has been removed.
+
+    ```C++
+    class Solution {
+        public:
+            bool prune_helper(TreeNode* node, TreeNode* parent){
+                if(node == NULL){
+
+                    if(parent->val == 1){
+                        return 1;
+                    }
+                    else{
+                        return 0;
+                    }
+                }
+
+                bool left = prune_helper(node->left,node);
+                bool right = prune_helper(node->right,node);
+
+                if(!left) node->left = NULL;
+                if(!right) node->right = NULL;
+
+                if(!left && !right && node->val != 1 ){
+                    return 0;
+                }
+
+                return 1;
+            }
+
+            TreeNode* pruneTree(TreeNode* root) {
+
+                bool var = prune_helper(root, NULL);
+                return root;
+            }
+    };
+    ```
+
+    ## **Notes**
+
+    * Recursively from bottom to top check subtrees and make pointers NULL accordingly.
+
+17. ## **Finding Duplicate Subtrees**</br>[Leetcode](https://leetcode.com/problems/find-duplicate-subtrees/)
+
+    Given a binary tree, return all duplicate subtrees. For each kind of duplicate subtrees, you only need to return the root node of any one of them.
+
+    ### **Approach 1**
+
+    ```C++
+        class Solution {
+        public:
+
+        int height_map(TreeNode* node,map<int,vector<TreeNode*>> &h_map){
+            if(node == NULL){
+                return -1;
+            }
+
+            int height = max(height_map(node->left,h_map),height_map(node->right,h_map)) +1;
+
+            h_map[height].push_back(node);
+
+            return height;
+        }
+
+        // compare two subtrees
+        bool compare_trees( TreeNode* root_a, TreeNode* root_b){
+            if(root_a == NULL && root_b == NULL){
+                return true;
+            }
+
+            if(root_a == NULL || root_b == NULL){
+                return false;
+            }
+
+            if(root_a->val != root_b->val){
+                return false;
+            }
+
+            else{
+                return (compare_trees(root_a->left,root_b->left) && compare_trees(root_a->right,root_b->right));
+            }
+        }
+
+        //compare all subtrees at the same height
+        vector<TreeNode*> findDuplicateSubtrees(TreeNode* root) {
+            map<int,vector<TreeNode*>> h_map;
+            int ht = height_map(root, h_map);
+
+            vector<TreeNode*> duplicates;
+            map<int, vector<TreeNode*>>::iterator it;
+            for(it = h_map.begin(); it != h_map.end(); it++){
+                vector<TreeNode*> same_height = it->second;
+                vector<bool> visited(same_height.size(),0);
+
+                for(int i =0; i <same_height.size(); i++){
+                    int h_count = 0;
+                    if(visited[i]) continue;
+                    visited[i] = 1;
+
+                    for(int j= i+1; j< same_height.size();j++){
+                        if(visited[j]) continue;
+
+                        if(compare_trees(same_height[i],same_height[j])){
+                            visited[j] = 1;
+                            h_count++;
+                            if(h_count == 1){
+                                duplicates.push_back(same_height[j]);
+                            }
+                        }
+                    }
+                }
+            }
+
+            return duplicates;
+        }
+    };
+
+18. ## **Convert Binary Search Tree to Greater Tree** </br> [Leetcode](https://leetcode.com/problems/convert-bst-to-greater-tree/submissions/)
+    Given a Binary Search Tree (BST), convert it to a Greater Tree such that every key of the original BST is changed to the original key plus sum of all keys greater than the original key in BST.
+
+    ```C++
+    class Solution {
+        public:
+
+            int bst_util(TreeNode* node, TreeNode* parent, bool is_left){
+                if( node == NULL){
+                    return 0;
+                }
+                node->val += bst_util(node->right,node,0);
+
+                if(node->left){
+                    node->left->val += node->val ;
+                }
+                return node->val;
+
+            }
+
+            TreeNode* convertBST(TreeNode* root) {
+
+                int val = bst_util(root,NULL,0);
+                return root;
+            }
+    };
+    ```
+
+    ### **Notes**
+
+    * Just do a reverse in order traversal by traversing right subtrees first.
+    * Maintain a global sum variable and accordingly modify the value of the node.
