@@ -868,6 +868,11 @@
     ```
 
 15. ## **Distribute Coins in a Binary Tree**</br>[Leetcode](https://leetcode.com/problems/distribute-coins-in-binary-tree/solution/)
+    Given the root of a binary tree with N nodes, each node in the tree has node.val coins, and there are N coins total.
+
+    In one move, we may choose two adjacent nodes and move one coin from one node to another.  (The move may be from parent to child, or from child to parent.)
+
+    Return the number of moves required to make every node have exactly one coin.
 
     ```C++
         class Solution {
@@ -892,7 +897,7 @@
     ### **NOTES**
 
     * **Intiution**: Moves to baalnce a leaf is $abs(NumCoins_{leaf} -1)$
-    * **Algorithm**: &nbsp; $moves_{node} = moves_{left} + moves_{right} + node->val -1$
+    * **Algorithm**: &nbsp; $moves_{node} = moves_{left} + moves_{right} + node\rightarrow val -1$
 
 16. ## **Binary Tree Pruning**</br>[Leetcode](https://leetcode.com/problems/binary-tree-pruning/)
 
@@ -982,8 +987,8 @@
         vector<TreeNode*> findDuplicateSubtrees(TreeNode* root) {
             map<int,vector<TreeNode*>> h_map;
             int ht = height_map(root, h_map);
-
             vector<TreeNode*> duplicates;
+
             map<int, vector<TreeNode*>>::iterator it;
             for(it = h_map.begin(); it != h_map.end(); it++){
                 vector<TreeNode*> same_height = it->second;
@@ -1019,23 +1024,24 @@
     class Solution {
         public:
 
-            int bst_util(TreeNode* node, TreeNode* parent, bool is_left){
+            void bst_util(TreeNode* node, int &sum){
                 if( node == NULL){
-                    return 0;
+                    return ;
                 }
-                node->val += bst_util(node->right,node,0);
 
-                if(node->left){
-                    node->left->val += node->val ;
-                }
-                return node->val;
+                bst_util(node->right,node,0);
+                sum += node->val;
+                node->val = sum;
+                bst_util(node->left,sum);
 
+                return;
             }
 
             TreeNode* convertBST(TreeNode* root) {
 
-                int val = bst_util(root,NULL,0);
-                return root;
+                int sum = 0;
+                bst_util(root,sum);
+                return sum;
             }
     };
     ```
@@ -1044,3 +1050,108 @@
 
     * Just do a reverse in order traversal by traversing right subtrees first.
     * Maintain a global sum variable and accordingly modify the value of the node.
+
+19. ## **Convert Sorted List to Binary Search Tree** </br> [Leetcode](https://leetcode.com/problems/convert-sorted-list-to-binary-search-tree/)
+
+    Given a singly linked list where elements are sorted in ascending order, convert it to a height balanced BST.
+
+    ```C++
+        class Solution {
+        public:
+
+        //Find Median of Linked List using fast and slow pointers
+        ListNode* find_median(ListNode* head){
+            if(head == NULL){
+                return NULL;
+            }
+
+            ListNode* slow = head;
+            ListNode* fast = head;
+            ListNode* prev = NULL;
+
+            while(fast != NULL){
+                fast = fast->next;
+
+                if(fast){
+                    fast = fast->next;
+                    prev = slow;
+                    slow = slow->next;
+                }
+            }
+
+            if(prev) prev->next = NULL;
+
+            return slow;
+
+        }
+
+        TreeNode* bst_util(ListNode* head){
+
+            if(head == NULL){
+                return NULL;
+            }
+
+            ListNode* mid = find_median(head);
+            TreeNode* root = new TreeNode(mid->val);
+
+            if(head == mid){
+                return root;
+            }
+
+            root->left = bst_util(head);
+
+            root->right = bst_util(mid->next);
+
+
+            return root;
+
+        }
+
+        TreeNode* sortedListToBST(ListNode* head) {
+
+            return bst_util(head);
+        }
+    };
+    ```
+
+    ### **Notes**
+
+    * Use fast slow pointers to find median of the list.
+    * Recursively keep splitting the list in two and modify the left and right pointers.
+
+20. ## **Unique Binary Search Trees**</br>[Leetcode](https://leetcode.com/problems/unique-binary-search-trees/)
+    Given n, how many structurally unique BST's (binary search trees) that store values 1 ... n?
+
+    ```C++
+    class Solution {
+    public:
+
+        int trees_dp(int n){
+
+            vector<int> map(n+1,0);
+            map[0] = 1;
+            map[1] = 1;
+
+            for(int i=2 ;i<=n ;i++){
+                for(int j=0; j<i ;j++){
+                    map[i] += map[j]*map[i-j-1];
+                }
+            }
+
+            return map[n];
+        }
+
+
+        int numTrees(int n) {
+
+            return trees_dp(n);
+
+        }
+    };
+    ```
+
+    ### **Notes**
+
+    * All nodes in the left subtree are smaller than the root and all nodes in the right subtree are greater than the root.
+
+    * If we have ith number as root then the left subtree can have $i-1$ 
