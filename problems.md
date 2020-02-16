@@ -238,29 +238,22 @@
                 while(!bfs_q.empty()) //bfs visit
                 {
                     int curr_node = bfs_q.front();
-
                     bfs_q.pop();
-
 
                     curr_level = level[curr_node] + 1;
                     for(int ngb: graph[curr_node])
                     {
-
                         if(stat[ngb] == 1) continue;
-
 
                         if(level[ngb] == level[curr_node]) //odd cycle
                         {
-
                             return 0;
                         }
-
 
                         bfs_q.push(ngb);
                         stat[ngb] = -1;
 
                         level[ngb] = curr_level;
-
                     }
 
                     stat[curr_node] = 1; //done processing current node
@@ -299,7 +292,6 @@
             for(int i =0; i<N; i++)
             {
                 if(stat[i] == 1) continue;
-
 
                 vector<int> levels(N,-1);
                 int start = i;
@@ -1120,6 +1112,7 @@
     * Recursively keep splitting the list in two and modify the left and right pointers.
 
 20. ## **Unique Binary Search Trees**</br>[Leetcode](https://leetcode.com/problems/unique-binary-search-trees/)
+
     Given n, how many structurally unique BST's (binary search trees) that store values 1 ... n?
 
     ```C++
@@ -1154,4 +1147,47 @@
 
     * All nodes in the left subtree are smaller than the root and all nodes in the right subtree are greater than the root.
 
-    * If we have ith number as root then the left subtree can have $i-1$ 
+    * If we have ith number as root then the left subtree can have $i-1$
+
+21. ## **Friend Circles**</br>[Leetcode](https://leetcode.com/problems/friend-circles/)
+
+    There are N students in a class. Some of them are friends, while some are not. Their friendship is transitive in nature. For example, if A is a direct friend of B, and B is a direct friend of C, then A is an indirect friend of C. And we defined a friend circle is a group of students who are direct or indirect friends.
+
+    Given a N*N matrix M representing the friend relationship between students in the class. If $M[i][j] = 1$, then the ith and jth students are direct friends with each other, otherwise not. And you have to output the total number of friend circles among all the students.
+
+    ```C++
+    class Solution {
+    public:
+        void dfs_visit(int person, vector<bool> &visited, vector<vector<int>>& M){
+
+            for(int j = 0; j<M[person].size() ; j++){
+
+                if(visited[j]) continue; //if a person has been visited than skip
+
+                if(M[person][j] == 1){
+                    visited[j] = true;
+                    dfs_visit(j,visited,M);
+                }
+            }
+        }
+
+        int findCircleNum(vector<vector<int>>& M) {
+            int groups = 0;
+            vector<bool> visited(M.size(),false);
+
+            for(int i=0; i< M.size(); i++){
+                if(visited[i]) continue;
+                visited[i] = true;
+                groups ++;
+                dfs_visit(i,visited,M); //visit all the disconnected groups
+            }
+
+            return groups;
+        }
+    };
+    ```
+
+    ### **Notes**
+    * This a question regarding finding components in a graph
+    * You try to visit each group using dfs and keep track using a visited flag.
+    * Very similar to counting islands question.
