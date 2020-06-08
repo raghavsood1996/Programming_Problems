@@ -1164,7 +1164,7 @@
 
                 if(visited[j]) continue; //if a person has been visited than skip
 
-                if(M[person][j] == 1){
+                if(M[person][j] == 1){//if friend than visit
                     visited[j] = true;
                     dfs_visit(j,visited,M);
                 }
@@ -1191,3 +1191,43 @@
     * This a question regarding finding components in a graph
     * You try to visit each group using dfs and keep track using a visited flag.
     * Very similar to counting islands question.
+
+22. ## **Add Two Numbers**</br>[Leetcode](https://leetcode.com/problems/add-two-numbers/)
+    
+    You are given two non-empty linked lists representing two non-negative integers. The digits are stored in reverse order and each of their nodes contain a single digit. Add the two numbers and return it as a linked list.
+
+    You may assume the two numbers do not contain any leading zero, except the number 0 itself.
+
+    ```C++
+    class Solution {
+    public:
+        ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
+            auto q1 = l1;
+            auto q2 = l2;
+            ListNode* curr = new ListNode(0);
+            ListNode* ret = curr;
+            int carry = 0;
+            //Add Two Numbers Like you would manually add them
+            while(q1 != NULL || q2 != NULL){
+                int num_1 = (q1 == NULL) ? 0 : q1->val;
+                int num_2 = (q2 == NULL) ? 0 : q2->val;
+                int sum = num_1 + num_2 +carry;
+                carry = sum/10;
+                curr->next = new ListNode(sum%10);
+                curr = curr->next;
+                if(q1 != NULL) q1 = q1->next;
+                if(q2 != NULL) q2 = q2->next;
+            }
+            if(carry > 0){
+                curr->next = new ListNode(carry);
+            }
+
+            return ret->next;
+        }
+    };
+    ```
+
+    ### **Notes**
+
+    * This is a simple linked list question.
+    * Add numbers like you manually add them using carry system.
